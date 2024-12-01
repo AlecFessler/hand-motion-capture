@@ -118,7 +118,8 @@ case $1 in
         log "INFO" "Stopping recording..."
         send_stop
         # Wait for files to finalize using inotify
-        inotifywait -e close_write "${VIDEO_BASE_PATH}/port*_vid*.mp4"
+        counter=$(cat "$COUNTER_FILE")
+        inotifywait -e close_write "${VIDEO_BASE_PATH}/port"*"_vid${counter}_"*".mp4"
         log "INFO" "Files finalized, stopping services..."
         for port in "${TCP_PORTS[@]}"; do
             if ! sudo systemctl stop ffmpeg-stream@"$port".service; then
@@ -142,7 +143,8 @@ case $1 in
         # Stop current recording
         send_stop
         # Wait for files to finalize
-        inotifywait -e close_write "${VIDEO_BASE_PATH}/port*_vid*.mp4"
+        counter=$(cat "$COUNTER_FILE")
+        inotifywait -e close_write "${VIDEO_BASE_PATH}/port"*"_vid${counter}_"*".mp4"
         log "INFO" "Files finalized, restarting services..."
         # Get new counter for new files
         counter=$(next_counter)
